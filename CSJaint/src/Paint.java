@@ -44,9 +44,10 @@ public class Paint extends JFrame implements MouseListener, MouseMotionListener 
     // TODO Auto-generated method stub
     mouseX = e.getX();
     mouseY = e.getY();
-    repaint();
     prevX = mouseX;
     prevY = mouseY;
+    repaint();
+
   }
 
   @Override
@@ -73,9 +74,9 @@ public class Paint extends JFrame implements MouseListener, MouseMotionListener 
   public void mouseDragged(MouseEvent e) {
     prevX = mouseX;
     prevY = mouseY;
-    repaint();
     mouseX = e.getX();
     mouseY = e.getY();
+    repaint();
 
   }
 
