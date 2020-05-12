@@ -1,6 +1,9 @@
+import java.awt.Point;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -8,11 +11,13 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JButton;
 
-public class Paint extends JFrame implements MouseListener, MouseMotionListener {
-	int mouseX = 0;
-	int mouseY = 0;
-	int prevX = 0;
-	int prevY = 0;
+public class Paint extends JFrame implements MouseListener, MouseMotionListener, KeyListener {
+
+	// Points to keep track of current and previous mouse locations respectively
+	Point curMouse;
+	Point prevMouse;
+
+	// TODO: actually implement this stuff in a useful way
 	private JFrame frame;
 	private JPanel canvas;
 	private JPanel toolbar;
@@ -20,6 +25,7 @@ public class Paint extends JFrame implements MouseListener, MouseMotionListener 
 	private JButton draw;
 	private JButton clear;
 
+	// Creates a BasicBrush object which stores brush data
 	private BasicBrush brush;
 
 	public Paint() {
@@ -27,9 +33,14 @@ public class Paint extends JFrame implements MouseListener, MouseMotionListener 
 		setTitle("CSJaint");
 		addMouseListener(this);
 		addMouseMotionListener(this);
-		setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		addKeyListener(this);
+
+		// set initial mouse positions all to zero
+		curMouse = new Point(0, 0);
+		prevMouse = new Point(0, 0);
 		brush = new BasicBrush(20);
-		
+
+		setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(1200, 900);
 		setVisible(true);
@@ -37,6 +48,12 @@ public class Paint extends JFrame implements MouseListener, MouseMotionListener 
 
 	public static void main(String[] args) {
 		new Paint();
+	}
+
+	public void paint(Graphics g) {
+//		super.paint(g);
+		Graphics2D g2d = (Graphics2D) g;
+		brush.draw(g2d, prevMouse, curMouse);
 	}
 
 	@Override
@@ -47,13 +64,11 @@ public class Paint extends JFrame implements MouseListener, MouseMotionListener 
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		// TODO Auto-generated method stub
-		mouseX = e.getX();
-		mouseY = e.getY();
-		prevX = mouseX;
-		prevY = mouseY;
-		repaint();
 
+		// basic drawing method
+		curMouse.setLocation(e.getX(), e.getY());
+		prevMouse.setLocation(curMouse);
+		repaint();
 	}
 
 	@Override
@@ -78,16 +93,36 @@ public class Paint extends JFrame implements MouseListener, MouseMotionListener 
 	}
 
 	public void mouseDragged(MouseEvent e) {
-		prevX = mouseX;
-		prevY = mouseY;
-		mouseX = e.getX();
-		mouseY = e.getY();
+		prevMouse.setLocation(curMouse);
+		curMouse.setLocation(e.getX(), e.getY());
 		repaint();
 
 	}
 
-	public void paint(Graphics g) {
-		Graphics2D g2d = (Graphics2D) g;
-		brush.draw(g2d, prevX, mouseX, prevY, mouseY);
+	@Override
+	public void keyTyped(KeyEvent e) {
+		// TODO Auto-generated method stub
+		int key = e.getKeyChar();
+		if (key == '[') {
+			brush.setSize(brush.getSize() - 1);
+		}
+		if (key == ']') {
+			brush.setSize(brush.getSize() + 1);
+		}
+		
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		// TODO Auto-generated method stub
+		if(e.isControlDown() && e.getKeyCode() == KeyEvent.VK_Z) {
+			System.out.println("undo");
+		}
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		// TODO Auto-generated method stub
+
 	}
 }
